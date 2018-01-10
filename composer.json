@@ -2,6 +2,11 @@
   "name": "deskpro/deskpro-api-client-php",
   "description": "PHP client for use with the Deskpro API.",
   "type": "library",
+  "config": {
+    "platform": {
+      "php": "5.5"
+    }
+  },
   "keywords": [
     "deskpro",
     "api"
@@ -16,12 +21,12 @@
     "guzzlehttp/guzzle": "^6.3",
     "psr/log": "^1.0"
   },
-  "require-dev": {
-    "phpunit/phpunit": "^6.5"
-  },
   "autoload": {
     "psr-0": {
       "Deskpro\\": "src/"
     }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^4.8"
   }
 }

@@ -2,6 +2,8 @@ Deskpro API PHP Client
 ======================
 PHP client for use with the Deskpro API.
 
+[![Build Status](https://travis-ci.org/deskpro/deskpro-api-client-php.svg?branch=master)](https://travis-ci.org/deskpro/deskpro-api-client-php)
+
 * [Installing](#installing)
 * [Basic Usage](#basic-usage)
 * [Default Headers](#default-headers)
