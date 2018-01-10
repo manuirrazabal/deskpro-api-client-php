@@ -14,7 +14,6 @@ PHP client for use with the Deskpro API.
 ## Requirements
 
 * PHP 5.5+ with Composer
-* Guzzlehttp/guzzle >= 6.3
 
 ## Installing
 
