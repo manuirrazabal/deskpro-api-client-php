@@ -2,11 +2,6 @@
   "name": "deskpro/deskpro-api-client-php",
   "description": "PHP client for use with the Deskpro API.",
   "type": "library",
-  "config": {
-    "platform": {
-      "php": "5.5"
-    }
-  },
   "keywords": [
     "deskpro",
     "api"
