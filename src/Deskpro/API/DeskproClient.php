@@ -52,6 +52,16 @@ class DeskproClient implements DeskproClientInterface
     const API_PATH = '/api/v2';
 
     /**
+     * Path to batch endpoint
+     */
+    const BATCH_ENDPOINT = '/batch';
+
+    /**
+     * Key for batch requests
+     */
+    const BATCH_KEY = 'requests';
+
+    /**
      * The authentication header
      */
     const AUTH_HEADER = 'Authorization';
@@ -314,6 +324,26 @@ class DeskproClient implements DeskproClientInterface
     /**
      * {@inheritdoc}
      */
+    public function batch(array $requests)
+    {
+        return $this->post(self::BATCH_ENDPOINT, [
+            self::BATCH_KEY => $requests
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function batchAsync(array $requests)
+    {
+        return $this->postAsync(self::BATCH_ENDPOINT, [
+            self::BATCH_KEY => $requests
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function request($method, $endpoint, $body = null, array $params = [], array $headers = [])
     {
         $endpoint = $this->urlInterpolator->interpolate($endpoint, $params);
@@ -404,6 +434,16 @@ class DeskproClient implements DeskproClientInterface
         if ($decoded === null) {
             return $body;
         }
+        
+        if (isset($decoded['responses'])) {
+            $responses = [];
+            foreach($decoded['responses'] as $name => $response) {
+                $responses[$name] = new APIResponse($response['data'], $response['meta'], $response['linked']);
+            }
+            
+            return $responses;
+        }
+        
         if (is_array($decoded) && (!isset($decoded['data']) || !isset($decoded['meta']) || !isset($decoded['linked']))) {
             return $decoded;
         }

@@ -239,6 +239,24 @@ interface DeskproClientInterface extends LoggerAwareInterface
     public function deleteAsync($endpoint, array $params = []);
 
     /**
+     * Sends a batch request to the API
+     * 
+     * @param array $requests Requests to send
+     * 
+     * @return APIResponseInterface[]
+     */
+    public function batch(array $requests);
+
+    /**
+     * Sends an asynchronous batch request to the API
+     * 
+     * @param array $requests Requests to send
+     * 
+     * @return PromiseInterface
+     */
+    public function batchAsync(array $requests);
+
+    /**
      * Sends a request to the API
      *
      * @param string $method The HTTP method to use, e.g. 'GET', 'POST', etc

@@ -123,6 +123,44 @@ try {
 }
 ```
 
+#### Batch request
+
+```php
+<?php
+use Deskpro\API\DeskproClient;
+use Deskpro\API\Exception\APIException;
+
+include(__DIR__ . '/vendor/autoload.php');
+
+$client = new DeskproClient('http://deskpro-dev.com');
+$client->setAuthKey(1, 'dev-admin-code');
+
+try {
+    $resp = $client->batch([
+        '105' => [
+            'method' => 'GET',
+            'url'    => '/articles/105'
+        ],
+        '106' => '/articles/106',
+        '107' => '/articles/107',
+        'new' => [
+            'method'  => 'POST',
+            'url'     => '/articles',
+            'payload' => [
+                'title'   => 'Mary Had a Little Lamb',
+                'content' => 'Whose fleece was white as snow.'
+            ]
+        ]
+    ]);
+    print_r($resp['105']->getData());
+    print_r($resp['106']->getData());
+    print_r($resp['107']->getData());
+    print_r($resp['new']->getData());
+} catch (APIException $e) {
+    echo $e->getMessage();
+}
+```
+
 #### Interpolating URLs
 
 ```php

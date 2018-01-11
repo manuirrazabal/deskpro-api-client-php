@@ -28,6 +28,7 @@
 
 use PHPUnit\Framework\TestCase;
 use Deskpro\API\DeskproClient;
+use Deskpro\API\APIResponseInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -357,6 +358,96 @@ class DeskproClientTest extends TestCase
         $resp = $promise->wait();
 
         $this->assertInternalType('array', $resp);
+    }
+
+    /**
+     * @covers ::batch
+     */
+    public function testBatch()
+    {
+        $body = [
+            'responses' => [
+                '101' => [
+                    'data' => [
+                        'id' => 101,
+                        'title' => 'Exercitationem illo quod et provident',
+                        'content' => 'Duchess: flamingoes and mustard both bite. And the Eaglet bent down its head down.'
+                    ],
+                    'meta' => [
+                        'count' => 1
+                    ],
+                    'linked' => []
+                ],
+                '102' => [
+                    'data' => [
+                        'id' => 102,
+                        'title' => 'Exercitationem illo quod et provident',
+                        'content' => 'Duchess: flamingoes and mustard both bite. And the Eaglet bent down its head down.'
+                    ],
+                    'meta' => [
+                        'count' => 1
+                    ],
+                    'linked' => []
+                ]
+            ]
+        ];
+
+        $client = $this->getMockClient([
+            new Response(200, [], json_encode($body))
+        ]);
+        $resp = $client->batch([
+            '101' => '/articles/101',
+            '102' => '/articles/102'
+        ]);
+        
+        $this->assertEquals($resp['101']->getData(), $body['responses']['101']['data']);
+        $this->assertEquals($resp['102']->getData(), $body['responses']['102']['data']);
+    }
+
+    /**
+     * @covers ::batchAsync
+     */
+    public function testBatchAsync()
+    {
+        $body = [
+            'responses' => [
+                '101' => [
+                    'data' => [
+                        'id' => 101,
+                        'title' => 'Exercitationem illo quod et provident',
+                        'content' => 'Duchess: flamingoes and mustard both bite. And the Eaglet bent down its head down.'
+                    ],
+                    'meta' => [
+                        'count' => 1
+                    ],
+                    'linked' => []
+                ],
+                '102' => [
+                    'data' => [
+                        'id' => 102,
+                        'title' => 'Exercitationem illo quod et provident',
+                        'content' => 'Duchess: flamingoes and mustard both bite. And the Eaglet bent down its head down.'
+                    ],
+                    'meta' => [
+                        'count' => 1
+                    ],
+                    'linked' => []
+                ]
+            ]
+        ];
+
+        $client = $this->getMockClient([
+            new Response(200, [], json_encode($body))
+        ]);
+        $promise = $client->batchAsync([
+            '101' => '/articles/101',
+            '102' => '/articles/102'
+        ]);
+        /** @var APIResponseInterface[] $resp */
+        $resp = $promise->wait();
+        
+        $this->assertEquals($resp['101']->getData(), $body['responses']['101']['data']);
+        $this->assertEquals($resp['102']->getData(), $body['responses']['102']['data']);
     }
 
     /**
