@@ -100,12 +100,12 @@ interface DeskproClientInterface extends LoggerAwareInterface
     /**
      * Sets the person ID and authentication key
      *
-     * @param int $personId The ID of the person being authenticated
+     * @param int $keyId The ID of the key being used
      * @param string $key The authentication key
      *
      * @return $this
      */
-    public function setAuthKey($personId, $key);
+    public function setAuthKey($keyId, $key);
 
     /**
      * Returns the headers sent with each request

@@ -208,9 +208,9 @@ class DeskproClient implements DeskproClientInterface
     /**
      * {@inheritdoc}
      */
-    public function setAuthKey($personId, $key)
+    public function setAuthKey($keyId, $key)
     {
-        $this->authKey = sprintf("%d:%s", $personId, $key);
+        $this->authKey = sprintf("%d:%s", $keyId, $key);
         
         return $this;
     }
