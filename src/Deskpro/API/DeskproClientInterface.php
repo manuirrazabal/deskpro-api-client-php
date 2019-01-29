@@ -98,14 +98,14 @@ interface DeskproClientInterface extends LoggerAwareInterface
     public function setAuthToken($personId, $token);
 
     /**
-     * Sets the person ID and authentication key
+     * Sets the key ID and authentication key
      *
-     * @param int $keyId The ID of the key being used
+     * @param int|string $keyId The ID of the key being used or full key prefixed by it's id, ex: '1:AWJ2BQ7WG589PQ6S862TCGY4'
      * @param string $key The authentication key
      *
      * @return $this
      */
-    public function setAuthKey($keyId, $key);
+    public function setAuthKey($keyId, $key = null);
 
     /**
      * Returns the headers sent with each request
@@ -240,18 +240,18 @@ interface DeskproClientInterface extends LoggerAwareInterface
 
     /**
      * Sends a batch request to the API
-     * 
+     *
      * @param array $requests Requests to send
-     * 
+     *
      * @return APIResponseInterface[]
      */
     public function batch(array $requests);
 
     /**
      * Sends an asynchronous batch request to the API
-     * 
+     *
      * @param array $requests Requests to send
-     * 
+     *
      * @return PromiseInterface
      */
     public function batchAsync(array $requests);

@@ -80,12 +80,12 @@ class DeskproClient implements DeskproClientInterface
      * Logs are prefixed with this string
      */
     const LOG_PREFIX = 'DeskproClient';
-    
+
     /**
      * @var string
      */
     protected $helpdeskUrl;
-    
+
     /**
      * @var ClientInterface
      */
@@ -128,7 +128,7 @@ class DeskproClient implements DeskproClientInterface
 
     /**
      * Constructor
-     * 
+     *
      * @param string          $helpdeskUrl The base URL to the DeskPRO instance
      * @param ClientInterface $httpClient  HTTP client used to make requests
      * @param LoggerInterface $logger      Used to log requests
@@ -155,7 +155,7 @@ class DeskproClient implements DeskproClientInterface
     public function setHelpdeskUrl($helpdeskUrl)
     {
         $this->helpdeskUrl = rtrim($helpdeskUrl, '/');
-        
+
         return $this;
     }
 
@@ -173,7 +173,7 @@ class DeskproClient implements DeskproClientInterface
     public function setHTTPClient(ClientInterface $httpClient)
     {
         $this->httpClient = $httpClient;
-        
+
         return $this;
     }
 
@@ -191,7 +191,7 @@ class DeskproClient implements DeskproClientInterface
     public function setURLInterpolator(URLInterpolatorInterface $urlInterpolator)
     {
         $this->urlInterpolator = $urlInterpolator;
-        
+
         return $this;
     }
 
@@ -201,17 +201,21 @@ class DeskproClient implements DeskproClientInterface
     public function setAuthToken($personId, $token)
     {
         $this->authToken = sprintf("%d:%s", $personId, $token);
-        
+
         return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setAuthKey($keyId, $key)
+    public function setAuthKey($keyId, $key = null)
     {
-        $this->authKey = sprintf("%d:%s", $keyId, $key);
-        
+        if (is_null($key) && is_string($keyId)) {
+            $this->authKey = $keyId;
+        } else {
+            $this->authKey = sprintf("%d:%s", $keyId, $key);
+        }
+
         return $this;
     }
 
@@ -229,7 +233,7 @@ class DeskproClient implements DeskproClientInterface
     public function setDefaultHeaders(array $defaultHeaders)
     {
         $this->defaultHeaders = $defaultHeaders;
-        
+
         return $this;
     }
 
@@ -347,12 +351,12 @@ class DeskproClient implements DeskproClientInterface
     public function request($method, $endpoint, $body = null, array $params = [], array $headers = [])
     {
         $endpoint = $this->urlInterpolator->interpolate($endpoint, $params);
-        
+
         try {
             $this->lastHTTPRequestException = null;
             $this->lastHTTPRequest  = $this->makeRequest($method, $endpoint, $body, $headers);
             $this->lastHTTPResponse = $this->httpClient->send($this->lastHTTPRequest);
-            
+
             return $this->makeResponse($this->lastHTTPResponse->getBody());
         } catch (RequestException $e) {
             $this->lastHTTPRequestException = $e;
@@ -368,7 +372,7 @@ class DeskproClient implements DeskproClientInterface
         $endpoint = $this->urlInterpolator->interpolate($endpoint, $params);
         $this->lastHTTPRequestException = null;
         $this->lastHTTPRequest = $this->makeRequest($method, $endpoint, $body, $headers);
-        
+
         return $this->httpClient->sendAsync($this->lastHTTPRequest)
             ->then(function(ResponseInterface $resp) {
                 $this->lastHTTPResponse = $resp;
@@ -381,7 +385,7 @@ class DeskproClient implements DeskproClientInterface
 
     /**
      * @param array $headers
-     * 
+     *
      * @return array
      */
     protected function makeHeaders(array $headers = [])
@@ -403,7 +407,7 @@ class DeskproClient implements DeskproClientInterface
      * @param string $endpoint
      * @param mixed $body
      * @param array $headers
-     * 
+     *
      * @return Request
      */
     protected function makeRequest($method, $endpoint, $body = null, array $headers = [])
@@ -419,13 +423,13 @@ class DeskproClient implements DeskproClientInterface
             'headers' => $headers,
             'body'    => $body
         ]);
-        
+
         return new Request($method, $url, $headers, $body);
     }
 
     /**
      * @param string $body
-     * 
+     *
      * @return APIResponseInterface|mixed
      */
     protected function makeResponse($body)
@@ -434,16 +438,16 @@ class DeskproClient implements DeskproClientInterface
         if ($decoded === null) {
             return $body;
         }
-        
+
         if (isset($decoded['responses'])) {
             $responses = [];
             foreach($decoded['responses'] as $name => $response) {
                 $responses[$name] = new APIResponse($response['data'], $response['meta'], $response['linked']);
             }
-            
+
             return $responses;
         }
-        
+
         if (is_array($decoded) && (!isset($decoded['data']) || !isset($decoded['meta']) || !isset($decoded['linked']))) {
             return $decoded;
         }
@@ -453,7 +457,7 @@ class DeskproClient implements DeskproClientInterface
 
     /**
      * @param string $body
-     * 
+     *
      * @return Exception\APIException
      */
     protected function makeException($body)
