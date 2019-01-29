@@ -1,13 +1,20 @@
 language: php
-
 php:
-  - 5.5
-  - 5.6
-  - 7.0
-  - 7.1
-
+- 5.5
+- 5.6
+- 7.0
+- 7.1
 before_script:
-  - travis_retry composer install --prefer-source --no-interaction
-
+- travis_retry composer install --prefer-source --no-interaction
 script:
-  - vendor/bin/phpunit
+- vendor/bin/phpunit
+before_deploy:
+  - ./build.sh
+deploy:
+  provider: releases
+  api_key:
+    secure: C4uk33XeUpyEeDUz3oTdFI8HnqXJ/jGOiXDh1GzYRDMOy82japGdPH76O6ocx//WKHLN78wHQ93DeATHF0xzQiHw6Zq2pnMoGK+xVzpx3YMlJ6JOQysB/3aCtGJAcZfWjXfkp5vDODHgiYa/LlaK5g9rKPi0oa5Tuc5p+oRX0uY1YNkzTXwvv1Uf9a2rCsonP4tIEkqrd1uKJsqpvxKTl0+QjF194zgZ/4YtLJoBAEMfuvapo4cPsVdpSY5SjB1mdeJnhYjykea5wzQ2Hf043wgtOEunKjt4Wxa8LQRx+VkA6PwoSfHRDJgbbMYcVGDgUr+WOtEA0fac+pM0iBaytVoUjG012ekDMIPMr+mlXODCYYYN3f8oheGZFtak7LRcIJdljlesxnjCiKlH5YU/RZ0HYA91qx2SdC3cMgGAuRA4v5SmmO5Q/Wt08XjkEqK+lFv2NZ67hz4KD8vfNmpqdjm37LIcis//4BenJhW9BFi8PXO0m3pQTHoJ55D1OyoCkG/qz7i7E2plmnGH+IjcdaR0LEy3UTmHAcZxoAJ5Fyi81Doj7QFeM6m5dzqxaIMdM5f3w9abuF8hwBEcCB3KxH4wb2ePZkEQfeNMBbkejyUHenawU82NBT6sDgMqE8mySiKrvsZ/3x28FQK6hRvuRcLMBzkt0aUzeGK8qdis+Cw=
+  file: build/deskpro.zip
+  skip_cleanup: true
+  on:
+    tags: true
