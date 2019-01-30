@@ -479,6 +479,16 @@ class DeskproClient implements DeskproClientInterface
                 break;
         }
 
+        if (isset($body['errors']) && count($body['errors'])) {
+            if (isset($body['errors']['fields'])) {
+                foreach ($body['errors']['fields'] as $field) {
+                    if (isset($field['errors'][0]['message'])) {
+                        return new Exception\APIException($body['message'].' '.$field['errors'][0]['message'], (int)$body['status']);
+                    }
+                }
+            }
+        }
+
         return new Exception\APIException($body['message'], (int)$body['status']);
     }
 }
