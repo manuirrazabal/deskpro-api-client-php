@@ -57,7 +57,7 @@ class DeskproClientTest extends TestCase
         $client = $this->getMockClient();
         $this->assertSame($client, $client->setAuthKey(1, 'testing'));
     }
-    
+
     /**
      * @covers ::setHelpdeskUrl
      * @covers ::getHelpdeskUrl
@@ -77,11 +77,11 @@ class DeskproClientTest extends TestCase
     {
         $client = $this->getMockClient();
         $httpClient = new Client();
-        
+
         $this->assertSame($client, $client->setHTTPClient($httpClient));
         $this->assertSame($httpClient, $client->getHTTPClient());
     }
-    
+
     /**
      * @covers ::getDefaultHeaders
      * @covers ::setDefaultHeaders
@@ -96,7 +96,7 @@ class DeskproClientTest extends TestCase
         $this->assertSame($client, $client->setDefaultHeaders($headers));
         $this->assertSame($headers, $client->getDefaultHeaders());
     }
-    
+
     /**
      * @covers ::request
      */
@@ -106,7 +106,7 @@ class DeskproClientTest extends TestCase
             new Response(200, [], json_encode([]))
         ]);
         $resp = $client->request('HEAD', '/articles');
-        
+
         $this->assertInternalType('array', $resp);
     }
 
@@ -120,10 +120,10 @@ class DeskproClientTest extends TestCase
         ]);
         $promise = $client->requestAsync('HEAD', '/articles');
         $resp = $promise->wait();
-        
+
         $this->assertInternalType('array', $resp);
     }
-    
+
     /**
      * @covers ::get
      */
@@ -160,7 +160,7 @@ class DeskproClientTest extends TestCase
         $resp = $client->get('/articles');
         $data = $resp->getData();
         $meta = $resp->getMeta();
-        
+
         $this->assertEquals($data[0], $body['data'][0]);
         $this->assertEquals($meta['count'], $body['meta']['count']);
     }
@@ -218,7 +218,7 @@ class DeskproClientTest extends TestCase
             'content_input_type' => 'rte',
             'status'             => 'published'
         ];
-        
+
         $postResp = [
             'data' => [
                 $body
@@ -342,7 +342,7 @@ class DeskproClientTest extends TestCase
             new Response(200, [], json_encode([]))
         ]);
         $resp = $client->delete('/articles/1');
-        
+
         $this->assertInternalType('array', $resp);
     }
 
@@ -399,7 +399,7 @@ class DeskproClientTest extends TestCase
             '101' => '/articles/101',
             '102' => '/articles/102'
         ]);
-        
+
         $this->assertEquals($resp['101']->getData(), $body['responses']['101']['data']);
         $this->assertEquals($resp['102']->getData(), $body['responses']['102']['data']);
     }
@@ -445,7 +445,7 @@ class DeskproClientTest extends TestCase
         ]);
         /** @var APIResponseInterface[] $resp */
         $resp = $promise->wait();
-        
+
         $this->assertEquals($resp['101']->getData(), $body['responses']['101']['data']);
         $this->assertEquals($resp['102']->getData(), $body['responses']['102']['data']);
     }
@@ -530,6 +530,37 @@ class DeskproClientTest extends TestCase
 
     /**
      * @covers ::get
+     * @expectedException \DeskPRO\API\Exception\APIException
+     * @expectedExceptionCode 400
+     * @expectedExceptionMessage Request input is invalid: 'department' One or more of the given values is invalid.
+     */
+    public function testGetProperExceptionMessage()
+    {
+        $body = [
+            'status' => 400,
+            'code' => 'invalid_input',
+            'message' => 'Request input is invalid',
+            'errors' => [
+                'fields' => [
+                    'department' => [
+                        'errors' => [
+                            [
+                                'code' => 'bad_choice',
+                                'message' => 'One or more of the given values is invalid.'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $client = $this->getMockClient([
+            new Response(400, [], json_encode($body))
+        ]);
+        $client->get('/articles');
+    }
+
+    /**
+     * @covers ::get
      * @expectedException \DeskPRO\API\Exception\AuthenticationException
      * @expectedExceptionCode 401
      */
@@ -588,12 +619,12 @@ class DeskproClientTest extends TestCase
         if (empty($responses)) {
             $responses[] = new Response(200, [], json_encode([]));
         }
-        
+
         $mock       = new MockHandler($responses);
         $handler    = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handler]);
         $client     = new DeskproClient('http://deskpro-dev.com', $httpClient);
-        
+
         return $client;
     }
 }

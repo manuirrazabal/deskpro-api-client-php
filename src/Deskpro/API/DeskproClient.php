@@ -479,16 +479,18 @@ class DeskproClient implements DeskproClientInterface
                 break;
         }
 
+//        return new Exception\APIException(json_encode($body['errors']['fields']), (int)$body['status']);
+
         if (isset($body['errors']) && count($body['errors'])) {
             if (isset($body['errors']['fields'])) {
                 foreach ($body['errors']['fields'] as $fieldName => $field) {
                     if (isset($field['errors'][0]['message'])) {
-                        return new Exception\APIException($body['message'].', '.$fieldName.':'.$field['errors'][0]['message'], (int)$body['status']);
+                        return new Exception\APIException($body['message'].': \''.$fieldName.'\' '.$field['errors'][0]['message'], (int)$body['status']);
                     }
                 }
             }
         }
 
-        return new Exception\APIException($body['message'], (int)$body['status']);
+        return new Exception\APIException('Blah'.$body['message'], (int)$body['status']);
     }
 }
