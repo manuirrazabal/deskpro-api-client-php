@@ -532,9 +532,36 @@ class DeskproClientTest extends TestCase
      * @covers ::get
      * @expectedException \DeskPRO\API\Exception\APIException
      * @expectedExceptionCode 400
+     * @expectedExceptionMessage Request input is invalid: One or more of the given values is invalid.
+     */
+    public function testGetProperRootExceptionMessage()
+    {
+        $body = [
+            'status' => 400,
+            'code' => 'invalid_input',
+            'message' => 'Request input is invalid',
+            'errors' => [
+                'errors' => [
+                    [
+                        'code' => 'bad_choice',
+                        'message' => 'One or more of the given values is invalid.'
+                    ]
+                ]
+            ]
+        ];
+        $client = $this->getMockClient([
+            new Response(400, [], json_encode($body))
+        ]);
+        $client->get('/articles');
+    }
+
+    /**
+     * @covers ::get
+     * @expectedException \DeskPRO\API\Exception\APIException
+     * @expectedExceptionCode 400
      * @expectedExceptionMessage Request input is invalid: 'department' One or more of the given values is invalid.
      */
-    public function testGetProperExceptionMessage()
+    public function testGetProperFieldExceptionMessage()
     {
         $body = [
             'status' => 400,
@@ -549,6 +576,41 @@ class DeskproClientTest extends TestCase
                                 'message' => 'One or more of the given values is invalid.'
                             ]
                         ]
+                    ]
+                ]
+            ]
+        ];
+        $client = $this->getMockClient([
+            new Response(400, [], json_encode($body))
+        ]);
+        $client->get('/articles');
+    }
+
+    /**
+     * @covers ::get
+     * @expectedException \DeskPRO\API\Exception\APIException
+     * @expectedExceptionCode 400
+     * @expectedExceptionMessage Request input is invalid: 'parent_field.child_field' One or more of the given values is invalid.
+     */
+    public function testGetProperChildFieldExceptionMessage()
+    {
+        $body = [
+            'status' => 400,
+            'code' => 'invalid_input',
+            'message' => 'Request input is invalid',
+            'errors' => [
+                'fields' => [
+                    'parent_field' => [
+                        'fields' => [
+                            'child_field' => [
+                                'errors' => [
+                                    [
+                                        'code' => 'bad_choice',
+                                        'message' => 'One or more of the given values is invalid.'
+                                    ]
+                                ]
+                            ],
+                        ],
                     ]
                 ]
             ]

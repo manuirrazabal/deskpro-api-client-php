@@ -467,30 +467,47 @@ class DeskproClient implements DeskproClientInterface
             return new Exception\MalformedResponseException('Could not JSON decode API response.', 0);
         }
 
+        $status  = (int) $body['status'];
+        $message = $body['message'];
+
         switch($body['status']) {
             case 401:
-                return new Exception\AuthenticationException($body['message'], 401);
-                break;
+                return new Exception\AuthenticationException($message, 401);
             case 403:
-                return new Exception\AccessDeniedException($body['message'], 403);
-                break;
+                return new Exception\AccessDeniedException($message, 403);
             case 404:
-                return new Exception\NotFoundException($body['message'], 404);
-                break;
+                return new Exception\NotFoundException($message, 404);
         }
 
-//        return new Exception\APIException(json_encode($body['errors']['fields']), (int)$body['status']);
+        if (isset($body['errors'])) {
+            $getFieldErrorIterator = function ($response, $propertyPath = []) use (&$getFieldErrorIterator, $status, $message) {
+                if (isset($response['errors'][0]['message'])) {
+                    $details = $response['errors'][0]['message'];
+                    if ($propertyPath) {
+                        $formattedPath = implode('.', $propertyPath);
 
-        if (isset($body['errors']) && count($body['errors'])) {
-            if (isset($body['errors']['fields'])) {
-                foreach ($body['errors']['fields'] as $fieldName => $field) {
-                    if (isset($field['errors'][0]['message'])) {
-                        return new Exception\APIException($body['message'].': \''.$fieldName.'\' '.$field['errors'][0]['message'], (int)$body['status']);
+                        return new Exception\APIException("$message: '$formattedPath' $details", $status);
+                    } else {
+                        return new Exception\APIException("$message: $details", $status);
+                    }
+                } elseif (isset($response['fields'])) {
+                    foreach ($response['fields'] as $childField => $fieldResponse) {
+                        $childError = $getFieldErrorIterator($fieldResponse, array_merge($propertyPath, [$childField]));
+                        if ($childError) {
+                            return $childError;
+                        }
                     }
                 }
+
+                return null;
+            };
+
+            $error = $getFieldErrorIterator($body['errors']);
+            if ($error) {
+                return $error;
             }
         }
 
-        return new Exception\APIException('Blah'.$body['message'], (int)$body['status']);
+        return new Exception\APIException($message, $status);
     }
 }
