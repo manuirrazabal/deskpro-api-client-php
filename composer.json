@@ -1,6 +1,6 @@
 {
-  "name": "deskpro/deskpro-api-client-php",
-  "description": "PHP client for use with the Deskpro API.",
+  "name": "manuirrazabal/deskpro-api-client-php",
+  "description": "PHP client for use with the Deskpro API. Forked from deskpro/deskpro-api-client-php",
   "type": "library",
   "config": {
     "platform": {
@@ -11,7 +11,7 @@
     "deskpro",
     "api"
   ],
-  "homepage": "https://github.com/deskpro/deskpro-api-client-php",
+  "homepage": "https://github.com/manuirrazabal/deskpro-api-client-php",
   "license": "BSD-3-Clause",
   "scripts": {
     "test": "phpunit"
